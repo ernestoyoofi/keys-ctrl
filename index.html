@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keyboard & Mouse Remote</title>
+  <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+    }
+    .keyboard-area-changeing {
+      width: calc(40px*18);
+      background-color: #e4e4e4;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 8px 0px;
+      user-select: none;
+    }
+    .keyboard-area-changeing button {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      border: none;
+      background-color: #242424;
+      color: white;
+      margin: 2px;
+      cursor: pointer;
+      transition: .2s;
+      font-weight: bold;
+    }
+    .keyboard-area-changeing button:active {
+      opacity: 0.7;
+    }
+    .keyboard-area-changeing button[data-style="next"] {
+      margin-right: 45px;
+    }
+    .keyboard-area-changeing .highles {
+      padding-bottom: 12px;
+    }
+    .flex-key {
+      display: flex;
+      user-select: none;
+    }
+    .mouse-area-changeing {
+      width: calc(100% - calc(40px*18));
+      height: 288.4px;
+    }
+    .mouse-area-changeing canvas {
+      width: 100%;
+      height: calc(288.4px - 60px);
+      border-bottom: 1px solid #c4c4c4;
+    }
+    .mouse-area-changeing .button {
+      width: 100%;
+      height: 60px;
+      display: flex;
+    }
+    .mouse-area-changeing .button button {
+      width: calc(100%/2);
+      height: 60px;
+      background-color: transparent;
+      border: none;
+      border-right: 1px solid #c4c4c4;
+      cursor: pointer;
+      margin: 0px;
+    }
+    .mouse-area-changeing .button button[data-active] {
+      background-color: #ff8d8d;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex-key">
+    <div class="keyboard-area-changeing">
+      <div class="highles">
+      </div>
+      <div class="normal"></div>
+    </div>
+    <div class="mouse-area-changeing">
+      <canvas></canvas>
+      <div class="button">
+        <button data-id="left_click"></button>
+        <button data-id="right_click"></button>
+      </div>
+    </div>
+  </div>
+  <div style="padding-top: 20px; display: block;">
+    <span style="display: flex;">Holding Key Combination <input type="checkbox" name="holding" data-id="holding-data"/></span>
+    <span style="display: flex;">Holding Mouse Button <input type="checkbox" name="holding" data-id="holding-mouse"/></span>
+    <span style="display: flex;">Total Key Combination <input type="number" name="holding" data-id="holding-data-num" value="2"/></span>
+  </div>
+  <script>
+    const highlesDoc = document.querySelector('.keyboard-area-changeing .highles')
+    const normalKeyDoc = document.querySelector('.keyboard-area-changeing .normal')
+    const highlesKeys = [
+      "esc,press_sckey,Esc,next",
+      "f1,press_sckey,F1",
+      "f2,press_sckey,F2",
+      "f3,press_sckey,F3",
+      "f4,press_sckey,F4,next",
+      "f5,press_sckey,F5",
+      "f6,press_sckey,F6",
+      "f7,press_sckey,F7",
+      "f8,press_sckey,F8,next",
+      "f9,press_sckey,F9",
+      "f10,press_sckey,F10",
+      "f11,press_sckey,F11",
+      "f12,press_sckey,F12"
+    ]
+    const normalKeys = [
+      "`,press_key,~,45",
+      "1,press_key,1",
+      "2,press_key,2",
+      "3,press_key,3",
+      "4,press_key,4",
+      "5,press_key,5",
+      "6,press_key,6",
+      "7,press_key,7",
+      "8,press_key,8",
+      "9,press_key,9",
+      "0,press_key,0",
+      "-,press_key,-",
+      "=,press_key,=",
+      "Backspace,press_sckey,Backspace,120",
+      // ---
+      "Tab,press_cskey,Tab",
+      "q,press_key,q",
+      "w,press_key,w",
+      "e,press_key,e",
+      "r,press_key,r",
+      "t,press_key,t",
+      "y,press_key,y",
+      "u,press_key,u",
+      "i,press_key,i",
+      "o,press_key,o",
+      "p,press_key,p",
+      "[,press_key,[",
+      "],press_key,]",
+      "Enter,press_sckey,Enter,125",
+      // ---
+      "caps_lock,press_sckey,Caps Lock,90",
+      "a,press_key,a",
+      "s,press_key,s",
+      "d,press_key,d",
+      "f,press_key,f",
+      "g,press_key,g",
+      "h,press_key,h",
+      "j,press_key,j",
+      "k,press_key,k",
+      "l,press_key,l",
+      ";,press_key,;",
+      "',press_key,'",
+      "$slash,press_key,$slash",
+      "Enter,press_sckey,Enter,75",
+      // ---
+      "Shift,press_sckey,Shift,97",
+      "z,press_key,z",
+      "x,press_key,x",
+      "c,press_key,c",
+      "v,press_key,v",
+      "b,press_key,b",
+      "n,press_key,n",
+      "m,press_key,m",
+      "$coma,press_key,$coma",
+      "$dot,press_key,$dot",
+      "$slashed,press_key,$slashed",
+      "Shift,press_sckey,Shift,155",
+      // ---
+      "Ctrl,press_sckey,Ctrl,87",
+      "cmd,press_sckey,Cmd",
+      "Alt,press_sckey,Alt",
+      "Space,press_sckey,—,330",
+      "Alt,press_sckey,Alt",
+      "Fn,press_sckey,Fn",
+      "Ctrl,press_sckey,Ctrl,94",
+    ]
+    function ChangeValue(cs) {
+      return cs.replace("$slashed", "/").replace("$slash","\\").replace("$coma", ",").replace("$dot", ".")
+    }
+    for(let a of highlesKeys) {
+      const [value,type,label,next] = a.split(",")
+      const btn = document.createElement("button")
+      btn.innerText = label
+      btn.setAttribute("data-id", value)
+      btn.setAttribute("data-type", type)
+      if(!!next) {
+        btn.setAttribute("data-style", "next")
+      }
+      highlesDoc.append(btn)
+    }
+    for(let a of normalKeys) {
+      const [value,type,label,next] = a.split(",")
+      const btn = document.createElement("button")
+      btn.innerText = ChangeValue(label)
+      btn.setAttribute("data-id", ChangeValue(value))
+      btn.setAttribute("data-type", type)
+      if(!!next) {
+        btn.style.width = next+"px"
+      }
+      normalKeyDoc.append(btn)
+    }
+  </script>
+  <script>
+    const host = prompt("Socket...", "ws://192.168.1.4:8442")
+    const holdingKey = document.querySelector('[data-id="holding-data"]')
+    const holdingMouse = document.querySelector('[data-id="holding-mouse"]')
+    const socket = new WebSocket(host)
+    function sendMouseAction(value) {
+      console.log("Mouse:", value)
+      if(socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          action: value,
+        }))
+      }
+    }
+    function sendMouseRelease(type, value) {
+      console.log("Mouse Release:", [type, value])
+      if(socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          action: "mouse_release",
+          type: type,
+          post: value
+        }))
+      }
+    }
+    function sendMouseMovment(x, y) {
+      console.log("Mouse Move:", [x,y])
+      if(socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          action: "move_mouse",
+          details: { dx: x, dy: y }
+        }))
+      }
+    }
+    function keyboardAction(type, value) {
+      console.log("Keyboard:", [type,value])
+      if(socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          action: type,
+          key: value
+        }))
+      }
+    }
+    document.querySelectorAll('.mouse-area-changeing .button button').forEach(a => {
+      a.addEventListener("click", () => {
+        const releaseKey = a.getAttribute("data-id")
+        const valueKey = releaseKey.split("_")[0]
+        if(holdingMouse.checked) {
+          let typeStatus = "release"
+          if(!a.getAttribute("data-active")) {
+            typeStatus = "press"
+            a.setAttribute("data-active","!")
+          } else {
+            a.removeAttribute("data-active")
+          }
+          sendMouseRelease(typeStatus, valueKey)
+          return;
+        }
+        sendMouseAction(releaseKey)
+      })
+    })
+    document.querySelectorAll('.keyboard-area-changeing button').forEach(a => {
+      a.addEventListener("click", () => {
+        let keyRelese = []
+        document.querySelectorAll('.keyboard-area-changeing button').forEach(c => {
+          if(c.getAttribute("data-hold")) {
+            keyRelese.push([
+              c.getAttribute("data-type"),
+              c.getAttribute("data-id")
+            ])
+          }
+        })
+        const numP = Number(document.querySelector('[data-id="holding-data-num"]').value)
+        console.log(holdingKey)
+        if(holdingKey.checked) {
+          if(keyRelese.length < (numP - 1)) {
+            a.setAttribute("data-hold","true")
+            return;
+          }
+          keyRelese.push([
+            a.getAttribute("data-type"),
+            a.getAttribute("data-id")
+          ])
+          document.querySelectorAll('.keyboard-area-changeing button').forEach(c => {
+            if(c.getAttribute("data-hold")) {
+              c.removeAttribute("data-hold")
+            }
+          })
+          keyboardAction(
+            "press_combination",
+            keyRelese
+          )
+          holdingKey.checked = false
+          return;
+        }
+        keyboardAction(
+          a.getAttribute("data-type"),
+          a.getAttribute("data-id")
+        )
+      })
+    })
+    const canvas = document.querySelector('.mouse-area-changeing canvas')
+    const ctx = canvas.getContext("2d")
+    let isDragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+    canvas.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      lastX = e.offsetX;
+      lastY = e.offsetY;
+    });
+    canvas.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+    canvas.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        const dx = e.offsetX - lastX
+        const dy = e.offsetY - lastY
+        sendMouseMovment(dx, dy)
+        lastX = e.offsetX
+        lastY = e.offsetY
+
+        // Visual moveing
+        // ctx.clearRect(0, 0, canvas.width, canvas.height)
+        // ctx.beginPath()
+        // ctx.arc(e.offsetX, e.offsetY, 5, 0, Math.PI * 2)
+        // ctx.fillStyle = "red"
+        // ctx.fill()
+        // ctx.closePath()
+      }
+    })
+    canvas.addEventListener("touchstart", (event) => {
+      isDragging = true
+      const touch = event.touches[0]
+      lastTouchX = touch.clientX
+      lastTouchY = touch.clientY
+    })
+    canvas.addEventListener("touchmove", (event) => {
+      if (isDragging) {
+        const touch = event.touches[0];
+        const dx = touch.clientX - lastTouchX
+        const dy = touch.clientY - lastTouchY
+        sendMouseMovment(dx, dy);
+        lastTouchX = touch.clientX
+        lastTouchY = touch.clientY
+      }
+      event.preventDefault()
+    })
+    canvas.addEventListener("touchend", () => {
+      isDragging = false
+    })
+  </script>
+</body>
+</html>
