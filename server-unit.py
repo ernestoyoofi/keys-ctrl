@@ -126,7 +126,8 @@ async def handle_connection(websocket):
 # Connection
 async def main():
   port_server = 8442
-  server = await websockets.serve(handle_connection, "192.168.1.4", port_server)
+  ip_server = "192.168.1.4" # set it however you like, can localhost or 196.168.x.x, for example this 192.168.1.4 or 0.0.0.0
+  server = await websockets.serve(handle_connection, ip_server, port_server)
 
   try:
     print(f'Starting Server: ws://localhost:{port_server}')
