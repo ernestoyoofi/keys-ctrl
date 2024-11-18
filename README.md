@@ -13,6 +13,8 @@ async def main():
   server = await websockets.serve(handle_connection, ip_server, port_server)
 ```
 
+How to connect you just copy the [html](./index.html) to another device to access it, then in the prompt section you fill in the url or ws url in [server-unit.py](./server-unit.py)
+
 You change the ip_server and port_server parts as you wish.
 
 _This script is only used for testing and learning only_
