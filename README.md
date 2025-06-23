@@ -1,6 +1,9 @@
  # Keys Control
 
 > [!WARNING]  
+> Page has been archived, if you want to fork please but not used for bad things
+
+> [!CAUTION]  
 > This script is not used for any place, so make sure this is not done for bad things or harming someone, I as the one who has this repository is not responsible for mistakes that occur
 
 A script which controls the keyboard and mouse, including movement and what buttons are clicked.
